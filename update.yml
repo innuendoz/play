@@ -1,0 +1,30 @@
+---
+- name: Update various Linux distributions
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt package manager cache for Ubuntu and Debian
+      apt:
+        update_cache: yes
+      when: ansible_system == "Ubuntu" or ansible_system == "Debian"
+
+    - name: Upgrade installed packages on Ubuntu and Debian
+      apt:
+        upgrade: yes
+        state: latest
+      when: ansible_system == "Ubuntu" or ansible_system == "Debian"
+
+    - name: Update pacman package manager cache for Arch
+      pacman:
+        update_cache: yes
+      when: ansible_system == "Arch"
+
+    - name: Upgrade installed packages on Arch
+      pacman:
+        upgrade: yes
+      when: ansible_system == "Arch"
+
+    - name: Reboot if required
+      reboot:
+        reboot_timeout: 300
+        when: reboot_required
