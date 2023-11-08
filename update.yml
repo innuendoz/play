@@ -26,7 +26,7 @@
 
     - name: Upgrade installed packages on Rhino
       command: rpk update -y
-      when:  ansible_lsb == "Rhinolinux"
+      when:  ansible_hostname == "NZXT-Rhino"
 
     - name: Update snap packages
       command: snap refresh
