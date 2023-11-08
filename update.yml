@@ -6,23 +6,23 @@
     - name: Update apt package manager cache for Ubuntu and Debian
       apt:
         update_cache: yes
-      when: ansible_system == "Ubuntu" or ansible_system == "Debian"
+      when:  ansible_os_family == "Ubuntu" or  ansible_os_family == "Debian"
 
     - name: Upgrade installed packages on Ubuntu and Debian
       apt:
         upgrade: yes
         state: latest
-      when: ansible_system == "Ubuntu" or ansible_system == "Debian"
+      when:  ansible_os_family == "Ubuntu" or  ansible_os_family == "Debian"
 
     - name: Update pacman package manager cache for Arch
       pacman:
         update_cache: yes
-      when: ansible_system == "Arch"
+      when:  ansible_os_family == "ArchLinux"
 
     - name: Upgrade installed packages on Arch
       pacman:
         upgrade: yes
-      when: ansible_system == "Arch"
+      when:  ansible_os_family == "ArchLinux"
 
     - name: check if system reboot is required
       become: true
@@ -31,5 +31,5 @@
       register: reboot_required
     - debug:
         msg: "Reboot is required"
-        reboot:
+        reboot: yes
       when: reboot_required.stat.exists
