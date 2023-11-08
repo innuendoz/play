@@ -14,15 +14,25 @@
         state: latest
       when:  ansible_os_family == "Ubuntu" or  ansible_os_family == "Debian"
 
-    - name: Update pacman package manager cache for Arch
-      pacman:
-        update_cache: yes
-      when:  ansible_os_family == "ArchLinux"
+#    - name: Update pacman package manager cache for Arch
+#      pacman:
+#        update_cache: yes
+#      when:  ansible_os_family == "Archlinux"
+
+ #   - name: Upgrade installed packages on Arch
+ #     pacman:
+ #       upgrade: yes
+ #     when:  ansible_os_family == "Archlinux"
 
     - name: Upgrade installed packages on Arch
-      pacman:
-        upgrade: yes
-      when:  ansible_os_family == "ArchLinux"
+      command: eos-update --yay
+      when:  ansible_os_family == "Archlinux"
+
+    - name: Update snap packages
+      command: snap refresh
+
+    - name: Update flatpak packages
+      command: flatpak update
 
     - name: check if system reboot is required
       become: true
