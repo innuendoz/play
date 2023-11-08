@@ -5,6 +5,7 @@
   tasks:
     - name: Update apt package manager cache for Ubuntu and Debian
       apt:
+        cache_only: yes
         update_cache: yes
       when: ansible_system == "Ubuntu" or ansible_system == "Debian"
 
