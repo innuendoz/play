@@ -15,19 +15,19 @@
         state: latest
       when:  ansible_os_family == "Ubuntu" or  ansible_os_family == "Debian"
 
-#    - name: Update pacman package manager cache for Arch
-#      pacman:
-#        update_cache: yes
-#      when:  ansible_os_family == "Archlinux"
-
- #   - name: Upgrade installed packages on Arch
- #     pacman:
- #       upgrade: yes
- #     when:  ansible_os_family == "Archlinux"
+    - name: Update pacman package manager cache for Arch
+      pacman:
+        update_cache: yes
+      when:  ansible_os_family == "Archlinux"
 
     - name: Upgrade installed packages on Arch
-      command: eos-update --yay
+      pacman:
+        upgrade: yes
       when:  ansible_os_family == "Archlinux"
+
+    - name: Upgrade installed packages on Rhino
+      command: rpk update -y
+      when:  ansible_lsb == "Rhinolinux"
 
     - name: Update snap packages
       command: snap refresh
@@ -41,6 +41,6 @@
         path: /var/run/reboot-required
       register: reboot_required
     - debug:
-        msg: "Reboot is required"
+        msg: "Reboot is required, rebooting."
         reboot: yes
       when: reboot_required.stat.exists
