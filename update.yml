@@ -31,4 +31,5 @@
       register: reboot_required
     - debug:
         msg: "Reboot is required"
+        reboot:
       when: reboot_required.stat.exists
