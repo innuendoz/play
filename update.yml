@@ -5,7 +5,6 @@
   tasks:
     - name: Update apt package manager cache for Ubuntu and Debian
       apt:
-        cache_only: yes
         update_cache: yes
       when:  ansible_os_family == "Ubuntu" or  ansible_os_family == "Debian"
 
@@ -27,13 +26,15 @@
 
     - name: Upgrade installed packages on Rhino
       command: rpk update -y
-      when:  ansible_hostname == "NZXT-Rhino"
+      when: ansible_hostname == "NZXT-Rhino"
 
-    - name: Update snap packages
+    - name: Update all Snap packages
       command: snap refresh
+    - debug: "msg=Done"
 
-    - name: Update flatpak packages
-      command: flatpak update
+    - name: Update all Flatpak packages
+      command: flatpak update --noninteractive
+    - debug: "msg=Done"
 
     - name: check if system reboot is required
       become: true
