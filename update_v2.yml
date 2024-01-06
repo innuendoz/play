@@ -1,0 +1,60 @@
+---
+- name: Update various Linux distributions
+  hosts: all
+  become: true
+  roles:
+    - role: system_update
+      when: ansible_os_family == "Ubuntu" or ansible_os_family == "Debian"
+      vars:
+        package_manager: apt
+    - role: system_update
+      when: ansible_os_family == "Archlinux"
+      vars:
+        package_manager: pacman
+    - role: system_update
+      when: ansible_hostname == "NZXT-Rhino"
+      vars:
+        package_manager: yum
+        package_name: rpk
+
+- name: Update Snap packages (if available)
+  hosts: all
+  become: true
+  tasks:
+    - name: Check if snap is available
+      command: snap --version
+      register: snap_available
+    - name: Update Snap packages
+      snap:
+        name: "*"
+        state: latest
+      when: snap_available.rc == 0
+    - name: Snap not available, inform user
+      debug:
+        msg: "Snap is not available on this system. Skipping update."
+      when: snap_available.rc != 0
+
+- name: Update Flatpak packages
+  hosts: all
+  become: true
+  tasks:
+    - name: Update Flatpak packages
+      flatpak:
+        state: update
+
+- name: Check for reboot requirement
+  hosts: all
+  become: true
+  tasks:
+    - name: Check for reboot file
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+
+- name: Reboot system if required
+  hosts: all
+  become: true
+  when: reboot_required.stat.exists
+  tasks:
+    - name: Reboot the system
+      reboot:

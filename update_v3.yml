@@ -1,0 +1,106 @@
+- name: Update various Linux distributions
+  hosts: all
+  become: true
+  tasks:
+    - name: Upgrade installed packages on Ubuntu and Debian
+      apt:
+        autoremove: yes
+        update_cache: yes
+        upgrade: yes
+        state: latest
+      when: ansible_os_family == "Ubuntu" or ansible_os_family == "Debian"
+    
+    - name: Upgrade installed packages on Arch
+      pacman:
+        update_cache: yes
+        upgrade: yes
+      when: ansible_os_family == "Archlinux"
+    
+    - name: Upgrade installed packages on Rhino
+      command: rpk update -y
+      when: ansible_hostname == "NZXT-Rhino"
+    
+    # - name: Update all Snap packages
+    #   command: snap refresh
+    - name: Update Snap packages (if available)
+      command: snap --version
+      register: snap_available
+    - name: Update Snap packages
+      snap:
+        name: "*"
+        state: latest
+      when: snap_available.rc == 0
+    - name: Snap not available, inform user
+      debug:
+        msg: "Snap is not available on this system. Skipping update."
+      when: snap_available.rc != 0
+
+    - name: Update all Flatpak packages
+      command: flatpak update --noninteractive
+    
+    - name: check if system reboot is required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+
+    - name: Reboot system if required
+      reboot:
+      when: reboot_required.stat.exists == true
+    
+    # Added task to clear package cache after updates
+    - name: Clear package cache
+      become: true
+      command: "{{ item }}"
+      with_items:
+        - apt-get clean
+        - pacman -Scc
+        - dnf clean all
+        - dnf clean all        - pacman -Scc        - apt-get clean      with_items:      command: "{{ item }}"      become: true    - name: Clear package cache    # Added task to clear package cache after updates          when: reboot_required.stat.exists == true      reboot:    - name: Reboot system if required      register: reboot_required        path: /var/run/reboot-required      stat:    - name: check if system reboot is required          command: flatpak update --noninteractive    - name: Update all Flatpak packages        msg: "Snap is not available on this system. Skipping update."      debug:    - name: Snap not available, inform user      when: snap_available.rc == 0        state: latest        name: "*"      snap:    - name: Update Snap packages      register: snap_available      command: snap --version    - name: Update Snap packages (if available)    #   command: snap refresh    # - name: Update all Snap packages          when: ansible_hostname == "NZXT-Rhino"      command: rpk update -y    - name: Upgrade installed packages on Rhino          when: ansible_os_family == "Archlinux"        upgrade: yes        update_cache: yes      pacman:    - name: Upgrade installed packages on Arch          when: ansible_os_family == "Ubuntu" or ansible_os_family == "Debian"        state: latest        upgrade: yes        update_cache: yes        autoremove: yes      apt:    - name: Upgrade installed packages on Ubuntu and Debian  tasks:-
+- name: Update various Linux distributions
+  hosts: all
+  become: true
+  tasks:
+    - name: Upgrade installed packages on Ubuntu and Debian
+      apt:
+        autoremove: yes
+        update_cache: yes
+        upgrade: yes
+        state: latest
+      when:  ansible_os_family == "Ubuntu" or  ansible_os_family == "Debian"
+    
+    - name: Upgrade installed packages on Arch
+      pacman:
+        update_cache: yes
+        upgrade: yes
+      when:  ansible_os_family == "Archlinux"
+    
+    - name: Upgrade installed packages on Rhino
+      command: rpk update -y
+      when: ansible_hostname == "NZXT-Rhino"
+    
+    # - name: Update all Snap packages
+    #   command: snap refresh
+    - name: Update Snap packages (if available)
+      command: snap --version
+      register: snap_available
+    - name: Update Snap packages
+      snap:
+        name: "*"
+        state: latest
+      when: snap_available.rc == 0
+    - name: Snap not available, inform user
+      debug:
+        msg: "Snap is not available on this system. Skipping update."
+      when: snap_available.rc != 0
+
+    - name: Update all Flatpak packages
+      command: flatpak update --noninteractive
+    
+    - name: check if system reboot is required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required
+
+    - name: Reboot system if required
+      reboot:
+      when: reboot_required.stat.exists ==  true

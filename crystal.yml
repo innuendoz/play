@@ -1,0 +1,8 @@
+---
+- name: Updating Crystal
+  hosts: arch
+  tasks:
+    - name: Upgrade installed packages on Crystal Linux
+      become_user: innuendoz
+      command: ame upgrade --noconfirm
+      when: ansible_hostname == "crystal"

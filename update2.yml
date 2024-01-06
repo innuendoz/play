@@ -1,46 +1,39 @@
 ---
 - name: Update various Linux distributions
   hosts: all
-  become: true
   tasks:
-    - name: Update apt package manager cache for Ubuntu and Debian
-      apt:
-        update_cache: yes
-      when:  ansible_os_family == "Ubuntu" or  ansible_os_family == "Debian"
 
-    - name: Upgrade installed packages on Ubuntu and Debian
+    - name: Upgrade installed packages on Ubuntu and Debian # Update and upgrade apt packages
+      become: true  
       apt:
+        autoremove: yes
+        update_cache: yes
         upgrade: yes
         state: latest
       when:  ansible_os_family == "Ubuntu" or  ansible_os_family == "Debian"
 
-    - name: Update pacman package manager cache for Arch
+    - name: Upgrade installed packages on Arch # Update and upgrade pacman packages
+      become: true
       pacman:
         update_cache: yes
-      when:  ansible_os_family == "Archlinux"
-
-    - name: Upgrade installed packages on Arch
-      pacman:
         upgrade: yes
       when:  ansible_os_family == "Archlinux"
 
-    - name: Upgrade installed packages on Rhino
+    - name: Upgrade installed packages on Rhino Linux # Update Rhino packages
       command: rpk update -y
       when: ansible_hostname == "NZXT-Rhino"
 
-    - name: Update all Snap packages
+    - name: Update all Snap packages # Refresh snap packages
       command: snap refresh
-    - debug: "msg=Done"
 
-    - name: Update all Flatpak packages
+    - name: Update all Flatpak packages # Update flatpak packages
       command: flatpak update --noninteractive
-    - debug: "msg=Done"
 
-    - name: check if system reboot is required
+    - name: check if system reboot is required # Check if reboot is required
       stat:
         path: /var/run/reboot-required
       register: reboot_required
 
-    - name: Reboot system if required
+    - name: Reboot system if required # Reboot if required
       reboot:
       when: reboot_required.stat.exists ==  true
